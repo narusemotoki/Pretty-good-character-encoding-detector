@@ -27,8 +27,9 @@ import sys
 
 
 class Pgced(object):
-    def __init__(self):
+    def __init__(self, include_utf8=True):
         self.detector = UniversalDetector()
+        self.include_utf8 = include_utf8
         for_file = self.forFile
         for_url = self.forUrl
         self.funcs = {
@@ -38,21 +39,33 @@ class Pgced(object):
 
     def forFile(self, uri):
         with contextlib.closing(urllib.urlopen(uri)) as r:
-            return self.detect(r.readline)
+            return self.detect(r.readlines)
 
     def forUrl(self, uri):
         with open(uri) as f:
             return self.detect(lambda: f)
 
+    def convert(self, lines, source_encode, target_encode='utf-8'):
+        return [l.decode(source_encode).encode(target_encode) for l in lines]
+
     def detect(self, f):
-        d = self.detector
+        d, conv_utf8 = self.detector, self.include_utf8
         d.reset()
+        lines = []
         for l in f():
-            d.feed(l)
-            if d.done:
+            if not d.done:
+                d.feed(l)
+
+            if conv_utf8:
+                lines.append(l)
+
+            if d.done and not conv_utf8:
                 break
         d.close()
-        return d.result
+
+        return dict(d.result, **{
+            'converted': ''.join(self.convert(lines, d.result['encoding']))
+        } if conv_utf8 else {})
 
     def detectOne(self, source):
         return dict(self.funcs[source['type']](source['uri']), **source)

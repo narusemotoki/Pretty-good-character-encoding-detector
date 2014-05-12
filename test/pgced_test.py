@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from __future__ import print_function
 import unittest
 import pgced
+
+
+def u(text):
+    return text.decode('utf-8')
 
 
 class PgcedTest(unittest.TestCase):
@@ -18,16 +23,20 @@ class PgcedTest(unittest.TestCase):
 
     def testDetectAsciiFile(self):
         t = self._testDetectFile('ascii')
-        self.assertEquals(t['encoding'], 'ascii')
+        self.assertEqual(t['encoding'], 'ascii')
+        self.assertEqual(u(t['converted']).strip(), u'This is a ascii encoding file.')
 
     def testDetectUtf8File(self):
         t = self._testDetectFile('utf8')
-        self.assertEquals(t['encoding'], 'utf-8')
+        self.assertEqual(t['encoding'], 'utf-8')
+        self.assertEqual(u(t['converted']).strip(), u'これはUTF8でエンコードされたファイル')
 
     def testDetectEucjpFile(self):
         t = self._testDetectFile('eucjp')
-        self.assertEquals(t['encoding'], 'EUC-JP')
+        self.assertEqual(t['encoding'], 'EUC-JP')
+        self.assertEqual(u(t['converted']).strip(), u'これはEUC-JPでエンコードされたファイル')
 
     def testDetectShiftjisFile(self):
         t = self._testDetectFile('shiftjis')
-        self.assertEquals(t['encoding'], 'SHIFT_JIS')
+        self.assertEqual(t['encoding'], 'SHIFT_JIS')
+        self.assertEqual(u(t['converted']).strip(), u'これはSHIFT-JISでエンコードされたファイル')
