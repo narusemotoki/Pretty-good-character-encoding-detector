@@ -68,7 +68,7 @@ class Pgced(object):
         } if conv_utf8 else {})
 
     def detectOne(self, source):
-        return dict(self.funcs[source['type']](source['uri']), **source)
+        return dict(self.funcs[source['target_type']](source['uri']), **source)
 
     def detectMulti(self, sources):
         return [self.detectOne(s) for s in sources]

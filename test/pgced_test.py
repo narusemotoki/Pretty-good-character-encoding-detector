@@ -17,7 +17,7 @@ class PgcedTest(unittest.TestCase):
 
     def _testDetectFile(self, f):
         return self.pgced.detectOne({
-            'type': 'file',
+            'target_type': 'file',
             'uri': '{0}/{1}'.format(self.resource_path, f),
         })
 
